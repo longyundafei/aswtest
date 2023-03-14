@@ -1,0 +1,6 @@
+<Control_Unit_Parameters xmlns="ARINC653"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<Ports/>
+</Control_Unit_Parameters>

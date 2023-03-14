@@ -1,0 +1,19 @@
+project HelloWorld is
+
+   for Languages use ("C");
+   for Source_Dirs use ("./**");
+   for Exec_Dir use "helloworld-Bank_Debug";
+
+   package Make is
+      for Makefile use "makefile";
+   end Make;
+   package Ide is
+      for Gnatlist use "i686-pc-linux-gnu-gnatls";
+      for Gnat use "i686-pc-linux-gnu-gnat";
+      for Debugger_Command use "i686-pc-linux-gnu-gdb";
+      for Compiler_Command ("c") use "i686-pc-linux-gnu-gcc";
+      for Compiler_Command ("ada") use "i686-pc-linux-gnu-gnatmake";
+      for Compiler_Command ("c++") use "i686-pc-linux-gnu-g++";
+   end Ide;
+end HelloWorld;
+

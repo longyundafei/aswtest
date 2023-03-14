@@ -1,0 +1,67 @@
+ifeq "$(SCOE_BASE)" ""
+force:: ;
+% : force
+	@ echo ERROR: need a definition for SCOE_BASE
+	@ exit 1
+endif
+
+ifeq "$(PLATFORM)" ""
+force:: ;
+% : force
+	@ echo ERROR: need a definition for PLATFORM
+	@ exit 1
+endif
+include $(SCOE_BASE)/bin/commonDefinitions.mak
+include $(SCOE_BASE)/platforms/$(PLATFORM)/platformDefinitions.mak
+
+export SYSTEM_BASE  := $(SCOE_BASE)/Examples/helloworlda
+
+OUTPUTDIR = helloworld-Bank
+OUTPUTDIR_DEBUG := $(OUTPUTDIR)_Debug
+
+TARGET=$(OUTPUTDIR)/helloworld_main
+APPLICATION_ENTRY_POINT := helloworld_main
+
+CFLAGS = $(CFLAGS_DEFAULT_INCLUDE) \
+         Applications/helloworld_app/ \
+         -DENTRY_POINT=$(APPLICATION_ENTRY_POINT) 
+    
+LINK_FLAGS_RELEASE = -lpthread -lrt  $(SSLINTERFACE_LIB_RELEASE) $(AUTOTEST_LIB_RELEASE) \
+	-Wl,-T $(PLATFORM_LDS)
+
+LINK_FLAGS_DEBUG = -lpthread -lrt  $(SSLINTERFACE_LIB_DEBUG) $(AUTOTEST_LIB_DEBUG) \
+	-Wl,-T $(PLATFORM_LDS)
+
+SOURCE=Applications/helloworld_app/helloworld.c \
+       Applications/helloworld_app/printhello.c \
+       Applications/helloworld_app/AswTest.c \
+       Applications/helloworld_app/calPrms.c \
+       Applications/helloworld_app/ert_main.c \
+       Applications/helloworld_app/monPrms.c \
+       Applications/helloworld_app/rtGetInf.c \
+       Applications/helloworld_app/rtGetNaN.c \
+       Applications/helloworld_app/rt_nonfinite.c \
+       $(MAIN_SOURCE) \
+       Applications/helloworld_app/usrAppInit.c
+
+.PHONY: all makeDirectories release debug clean config
+
+all: clean makeDirectories release
+
+makeDirectories:
+	-if not exist $(OUTPUTDIR)	$(MKDIR) $(OUTPUTDIR)
+	
+release: makeDirectories config
+	$(CC) $(CFLAGS) -Wall $(SOURCE) -o $(TARGET) $(LINK_FLAGS_RELEASE)
+
+debug: OUTPUTDIR:=$(OUTPUTDIR_DEBUG)
+debug: makeDirectories config
+	$(CC) $(GCC_DEBUG_FLAGS) $(CFLAGS) -Wall $(SOURCE) -o $(TARGET) $(LINK_FLAGS_DEBUG)
+
+clean: 
+	-$(RMDIR) $(RMDIR_FLAGS) $(OUTPUTDIR)
+	-$(RMDIR) $(RMDIR_FLAGS) $(OUTPUTDIR_DEBUG)
+	
+config: 
+	$(ADECONFIGGEN) ConfigData/Module.xml /o=$(OUTPUTDIR)/PartitionConfig.cfg
+
